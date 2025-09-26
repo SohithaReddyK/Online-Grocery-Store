@@ -1,0 +1,29 @@
+# Stage 1: Build stage
+FROM node:18 AS build-stage
+WORKDIR /app
+
+# Install git
+RUN apt-get update && apt-get install -y git
+
+# Clone your frontend repo into a safe folder (no spaces)
+RUN git clone https://github.com/2300031777/GROCERY-FRONTEND.git grocery-frontend
+
+# Set working directory inside repo
+WORKDIR /app/grocery-frontend
+
+# Install dependencies and build Next.js app
+RUN npm install
+RUN npm run build
+
+# Stage 2: Production runtime
+FROM node:18 AS runtime
+WORKDIR /app
+
+# Copy built app from build stage
+COPY --from=build-stage /app/grocery-frontend ./
+
+# Expose Next.js port
+EXPOSE 3000
+
+# Start Next.js in production mode
+CMD ["npm", "start"]

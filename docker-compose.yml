@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: grocery-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: demo1
+      MYSQL_ROOT_PASSWORD: Nandini@2006
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - grocery-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pNandini@2006"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./cicd_backend-master   # ✅ backend folder
+      dockerfile: Dockerfile.backend   # ✅ inside backend folder
+    container_name: grocery-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/demo1
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Nandini@2006
+    depends_on:
+      - db
+    ports:
+      - "9090:8080"   # ✅ backend on http://localhost:9090
+    networks:
+      - grocery-net
+
+  frontend:
+    build:
+      context: ./CICD-frontend         # ✅ frontend folder
+      dockerfile: Dockerfile.frontend  # ✅ inside frontend folder
+    container_name: grocery-frontend
+    restart: always
+    ports:
+      - "4000:3000"   # ✅ frontend on http://localhost:4000
+    depends_on:
+      - backend
+    networks:
+      - grocery-net
+
+volumes:
+  db_data:
+
+networks:
+  grocery-net:
+    driver: bridge
