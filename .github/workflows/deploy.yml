@@ -23,7 +23,7 @@ jobs:
           username: ubuntu   # or ec2-user if Amazon Linux
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "."
-          target: /home/ubuntu/ecommercefullstack
+          target: /home/ubuntu/cicdgroceryfullstack
 
       - name: Deploy on EC2 with Docker Compose
         uses: appleboy/ssh-action@v1.0.0
@@ -34,7 +34,7 @@ jobs:
           script_stop: true
           debug: true
           script: |
-            cd ~/ecommercefullstack
+            cd ~/cicdgroceryfullstack
             sudo apt-get update -y
             sudo apt-get install -y git docker docker-compose
             sudo systemctl enable docker
